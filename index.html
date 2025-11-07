@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- iOS Specific Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Calco AR">
+    <meta name="format-detection" content="telephone=no">
+    
+    <title>Visor de Calco AR - Calculador de Dibujos</title>
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%234F46E5' width='100' height='100'/><text y='75' x='50' text-anchor='middle' font-size='70' fill='white'>📐</text></svg>">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            overscroll-behavior: none;
+            touch-action: none;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+        }
+        
+        #cameraFeed {
+            object-fit: cover;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #traceImage {
+            touch-action: none;
+            user-select: none;
+            will-change: transform;
+            position: absolute;
+            pointer-events: auto;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+        
+        #traceImage.locked {
+            pointer-events: none;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- 1. El visor de la cámara (fondo) -->
+    <video id="cameraFeed" playsinline autoplay muted webkit-playsinline></video>
+
+    <!-- 2. Canvas para dibujar (opcional) -->
+    <canvas id="drawingCanvas" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 5;"></canvas>
+
+    <!-- 3. La imagen para calcar (superpuesta) -->
+    <img id="traceImage" class="hidden" style="opacity: 0.5; z-index: 10;">
+
+    <!-- 4. Los controles (parte inferior) -->
+    <div id="controls" class="absolute bottom-0 left-0 w-full bg-black/80 p-4 shadow-lg backdrop-blur-sm slide-up" style="z-index: 20;">
+        <div class="flex flex-col gap-3 max-w-4xl mx-auto">
+            
+            <!-- Fila 1: Información de la imagen -->
+            <div id="imageInfo" class="text-xs text-gray-300 text-center hidden">
+                <span id="imageSize">Tamaño: -</span> | 
+                <span id="imageScale">Escala: 100%</span> | 
+                <span id="imagePosition">Pos: (0, 0)</span>
+            </div>
+            
+            <!-- Fila 2: Control de Opacidad -->
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-sm font-medium whitespace-nowrap flex-shrink-0">Opacidad:</span>
+                <input id="opacitySlider" type="range" min="0" max="100" value="50" class="w-full">
+                <span id="opacityValue" class="text-sm font-bold w-10 text-right">50%</span>
+            </div>
+
+            <!-- Fila 3: Botones de control -->
+            <div class="flex items-center justify-between gap-2">
+                <label for="upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 text-sm whitespace-nowrap flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                    </svg>
+                    Cargar
+                </label>
+                <input type="file" id="upload" accept="image/*" class="hidden">
+
+                <button id="resetButton" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 text-sm whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+
+                <button id="lockButton" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center gap-2">
+                    <svg id="icon-unlocked" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
+                    </svg>
+                    <svg id="icon-locked" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                    </svg>
+                    <span id="lockText">Libre</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Mensajes (Error o Info) -->
+    <div id="messageBox" class="absolute top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white p-4 rounded-lg shadow-lg hidden max-w-md w-11/12" style="z-index: 30;">
+        <div class="flex items-center justify-between">
+            <span id="messageText" class="flex-1"></span>
+            <button id="closeMessage" class="ml-4 font-bold hover:text-gray-200">✕</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elementos del DOM ---
+            const cameraFeed = document.getElementById('cameraFeed');
+            const traceImage = document.getElementById('traceImage');
+            const drawingCanvas = document.getElementById('drawingCanvas');
+            const ctx = drawingCanvas.getContext('2d');
+            const opacitySlider = document.getElementById('opacitySlider');
+            const opacityValue = document.getElementById('opacityValue');
+            const uploadInput = document.getElementById('upload');
+            const lockButton = document.getElementById('lockButton');
+            const resetButton = document.getElementById('resetButton');
+            const iconUnlocked = document.getElementById('icon-unlocked');
+            const iconLocked = document.getElementById('icon-locked');
+            const lockText = document.getElementById('lockText');
+            const imageInfo = document.getElementById('imageInfo');
+            const imageSize = document.getElementById('imageSize');
+            const imageScale = document.getElementById('imageScale');
+            const imagePosition = document.getElementById('imagePosition');
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const closeMessage = document.getElementById('closeMessage');
+
+            // --- Estado ---
+            let isLocked = false;
+            let currentX = 0;
+            let currentY = 0;
+            let scale = 1;
+            let isDragging = false;
+            let isPinching = false;
+            let startTouchX = 0;
+            let startTouchY = 0;
+            let startX = 0;
+            let startY = 0;
+            let initialPinchDistance = 0;
+            let initialScale = 1;
+
+            // --- 1. Iniciar la Cámara ---
+            async function startCamera() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showMessage("Error: Tu navegador no soporta la cámara.", "error");
+                    return;
+                }
+
+                try {
+                    // Configuración optimizada para iOS
+                    const constraints = {
+                        video: { 
+                            facingMode: { ideal: 'environment' },
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        },
+                        audio: false
+                    };
+                    
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    cameraFeed.srcObject = stream;
+                    
+                    // Asegurar que el video se reproduzca en iOS
+                    cameraFeed.setAttribute('playsinline', 'true');
+                    cameraFeed.setAttribute('webkit-playsinline', 'true');
+                    cameraFeed.play().catch(err => {
+                        console.warn("Error al reproducir video:", err);
+                    });
+                    
+                    setupCanvas();
+                } catch (err) {
+                    console.warn("Cámara trasera no disponible, intentando frontal:", err);
+                    try {
+                        // Fallback a cualquier cámara
+                        const stream = await navigator.mediaDevices.getUserMedia({ 
+                            video: { 
+                                width: { ideal: 1920 },
+                                height: { ideal: 1080 }
+                            },
+                            audio: false
+                        });
+                        cameraFeed.srcObject = stream;
+                        cameraFeed.setAttribute('playsinline', 'true');
+                        cameraFeed.setAttribute('webkit-playsinline', 'true');
+                        cameraFeed.play().catch(err => {
+                            console.warn("Error al reproducir video:", err);
+                        });
+                        setupCanvas();
+                        showMessage("Usando cámara frontal. La trasera no está disponible.", "info");
+                        setTimeout(() => {
+                            messageBox.classList.add('hidden');
+                        }, 3000);
+                    } catch (err2) {
+                        console.error("Error al acceder a la cámara:", err2);
+                        let errorMsg = `No se pudo acceder a la cámara: ${err2.message}`;
+                        if (window.location.protocol !== 'https:' && !window.location.hostname.includes('localhost') && window.location.hostname !== '127.0.0.1') {
+                            errorMsg += " Nota: Necesitas HTTPS, localhost o 127.0.0.1 para usar la cámara.";
+                        }
+                        showMessage(errorMsg, "error");
+                    }
+                }
+            }
+
+            // --- 2. Configurar Canvas ---
+            function setupCanvas() {
+                drawingCanvas.width = window.innerWidth;
+                drawingCanvas.height = window.innerHeight;
+            }
+
+            // --- 3. Manejar Subida de Imagen ---
+            uploadInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        traceImage.src = e.target.result;
+                        traceImage.onload = () => {
+                            traceImage.classList.remove('hidden');
+                            resetTransform();
+                            updateImageInfo();
+                            imageInfo.classList.remove('hidden');
+                            showMessage("Imagen cargada. Usa gestos para ajustar.", "info");
+                            setTimeout(() => {
+                                messageBox.classList.add('hidden');
+                            }, 3000);
+                        };
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // --- 4. Controles ---
+            opacitySlider.addEventListener('input', (event) => {
+                const value = event.target.value;
+                traceImage.style.opacity = value / 100;
+                opacityValue.textContent = value + '%';
+            });
+
+            lockButton.addEventListener('click', () => {
+                isLocked = !isLocked;
+                iconUnlocked.classList.toggle('hidden', isLocked);
+                iconLocked.classList.toggle('hidden', !isLocked);
+                lockText.textContent = isLocked ? 'Fijo' : 'Libre';
+                
+                if (isLocked) {
+                    lockButton.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                    lockButton.classList.add('bg-red-600', 'hover:bg-red-700');
+                    traceImage.classList.add('locked');
+                } else {
+                    lockButton.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    lockButton.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                    traceImage.classList.remove('locked');
+                }
+            });
+
+            resetButton.addEventListener('click', () => {
+                if (traceImage.src) {
+                    resetTransform();
+                    showMessage("Imagen recentrada", "info");
+                    setTimeout(() => {
+                        messageBox.classList.add('hidden');
+                    }, 2000);
+                }
+            });
+
+            // --- 5. Gestos Táctiles ---
+            traceImage.addEventListener('touchstart', handleTouchStart, { passive: false });
+            traceImage.addEventListener('touchmove', handleTouchMove, { passive: false });
+            traceImage.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+            function handleTouchStart(e) {
+                if (isLocked) return;
+                e.preventDefault();
+                
+                const touches = e.touches;
+                
+                if (touches.length === 1) {
+                    isDragging = true;
+                    isPinching = false;
+                    startTouchX = touches[0].clientX;
+                    startTouchY = touches[0].clientY;
+                    startX = currentX;
+                    startY = currentY;
+                } else if (touches.length === 2) {
+                    isDragging = false;
+                    isPinching = true;
+                    initialPinchDistance = getDistance(touches[0], touches[1]);
+                    initialScale = scale;
+                }
+            }
+
+            function handleTouchMove(e) {
+                if (isLocked) return;
+                e.preventDefault();
+                
+                const touches = e.touches;
+                
+                if (isDragging && touches.length === 1) {
+                    const deltaX = touches[0].clientX - startTouchX;
+                    const deltaY = touches[0].clientY - startTouchY;
+                    currentX = startX + deltaX;
+                    currentY = startY + deltaY;
+                    applyTransform();
+                    updateImageInfo();
+                } else if (isPinching && touches.length === 2) {
+                    const currentDistance = getDistance(touches[0], touches[1]);
+                    const scaleChange = currentDistance / initialPinchDistance;
+                    scale = Math.max(0.1, Math.min(5, initialScale * scaleChange));
+                    applyTransform();
+                    updateImageInfo();
+                }
+            }
+
+            function handleTouchEnd(e) {
+                if (e.touches.length < 2) {
+                    isPinching = false;
+                    initialPinchDistance = 0;
+                }
+                if (e.touches.length < 1) {
+                    isDragging = false;
+                }
+            }
+
+            // --- 6. Soporte para Mouse (escritorio) ---
+            let isMouseDown = false;
+            
+            traceImage.addEventListener('mousedown', (e) => {
+                if (isLocked) return;
+                e.preventDefault();
+                isMouseDown = true;
+                startTouchX = e.clientX;
+                startTouchY = e.clientY;
+                startX = currentX;
+                startY = currentY;
+                traceImage.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isMouseDown || isLocked) return;
+                const deltaX = e.clientX - startTouchX;
+                const deltaY = e.clientY - startTouchY;
+                currentX = startX + deltaX;
+                currentY = startY + deltaY;
+                applyTransform();
+                updateImageInfo();
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isMouseDown) {
+                    isMouseDown = false;
+                    traceImage.style.cursor = 'grab';
+                }
+            });
+
+            // Zoom con rueda del mouse
+            traceImage.addEventListener('wheel', (e) => {
+                if (isLocked) return;
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                scale = Math.max(0.1, Math.min(5, scale * delta));
+                applyTransform();
+                updateImageInfo();
+            }, { passive: false });
+
+            // --- 7. Funciones Auxiliares ---
+            function getDistance(touch1, touch2) {
+                const dx = touch1.clientX - touch2.clientX;
+                const dy = touch1.clientY - touch2.clientY;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+
+            function applyTransform() {
+                traceImage.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
+            }
+
+            function resetTransform() {
+                const imgRect = traceImage.getBoundingClientRect();
+                currentX = (window.innerWidth - imgRect.width) / 2;
+                currentY = (window.innerHeight - imgRect.height) / 2;
+                scale = 1;
+                
+                traceImage.style.left = '0';
+                traceImage.style.top = '0';
+                applyTransform();
+                updateImageInfo();
+            }
+
+            function updateImageInfo() {
+                if (traceImage.src) {
+                    imageSize.textContent = `Tamaño: ${traceImage.naturalWidth}×${traceImage.naturalHeight}px`;
+                    imageScale.textContent = `Escala: ${Math.round(scale * 100)}%`;
+                    imagePosition.textContent = `Pos: (${Math.round(currentX)}, ${Math.round(currentY)})`;
+                }
+            }
+
+            function showMessage(msg, type = "error") {
+                messageText.textContent = msg;
+                messageBox.classList.remove('bg-red-600', 'bg-blue-600', 'bg-green-600');
+                
+                if (type === "error") {
+                    messageBox.classList.add('bg-red-600');
+                } else if (type === "info") {
+                    messageBox.classList.add('bg-blue-600');
+                } else if (type === "success") {
+                    messageBox.classList.add('bg-green-600');
+                }
+                
+                messageBox.classList.remove('hidden');
+            }
+
+            closeMessage.addEventListener('click', () => {
+                messageBox.classList.add('hidden');
+            });
+
+            // --- 8. Ajustar canvas al redimensionar ---
+            window.addEventListener('resize', () => {
+                setupCanvas();
+            });
+
+            // --- Iniciar App ---
+            startCamera();
+            
+            // Mensaje de bienvenida
+            showMessage("¡Bienvenido! Carga una imagen para empezar a calcar.", "info");
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 4000);
+        });
+    </script>
+</body>
+</html>
