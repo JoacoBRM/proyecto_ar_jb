@@ -36,7 +36,15 @@
             object-fit: cover;
             position: absolute;
             width: 100%;
-            height: 100%;
+            height: calc(100vh - 180px);
+            top: 0;
+            left: 0;
+        }
+        
+        @media (max-width: 640px) {
+            #cameraFeed {
+                height: calc(100vh - 200px);
+            }
         }
         
         #traceImage {
@@ -46,11 +54,26 @@
             position: absolute;
             pointer-events: auto;
             max-width: 90vw;
-            max-height: 90vh;
+            max-height: calc(90vh - 200px);
         }
         
         #traceImage.locked {
             pointer-events: none;
+        }
+        
+        #drawingCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 180px);
+            pointer-events: none;
+        }
+        
+        @media (max-width: 640px) {
+            #drawingCanvas {
+                height: calc(100vh - 200px);
+            }
         }
         
         .slide-up {
@@ -98,14 +121,17 @@
     <video id="cameraFeed" playsinline autoplay muted webkit-playsinline></video>
 
     <!-- 2. Canvas para dibujar (opcional) -->
-    <canvas id="drawingCanvas" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 5;"></canvas>
+    <canvas id="drawingCanvas" class="absolute inset-0 w-full pointer-events-none" style="z-index: 5;"></canvas>
+
+    <!-- Área visual que indica el límite de la cámara -->
+    <div class="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-gray-900 to-transparent pointer-events-none" style="z-index: 1;"></div>
 
     <!-- 3. La imagen para calcar (superpuesta) -->
     <img id="traceImage" class="hidden" style="opacity: 0.5; z-index: 10;">
 
     <!-- 4. Los controles (parte inferior) -->
-    <div id="controls" class="absolute bottom-0 left-0 w-full bg-black/80 shadow-lg backdrop-blur-sm slide-up" style="z-index: 20; padding-bottom: env(safe-area-inset-bottom);">
-        <div class="flex flex-col gap-3 max-w-4xl mx-auto p-3 sm:p-4">
+    <div id="controls" class="absolute bottom-0 left-0 w-full bg-gray-900 shadow-2xl border-t-2 border-blue-500" style="z-index: 20; padding-bottom: env(safe-area-inset-bottom);">
+        <div class="flex flex-col gap-3 max-w-4xl mx-auto p-4 sm:p-4">
             
             <!-- Fila 1: Información de la imagen -->
             <div id="imageInfo" class="text-xs text-gray-300 text-center hidden">
@@ -265,8 +291,10 @@
 
             // --- 2. Configurar Canvas ---
             function setupCanvas() {
+                const isMobile = window.innerWidth <= 640;
+                const controlsHeight = isMobile ? 200 : 180;
                 drawingCanvas.width = window.innerWidth;
-                drawingCanvas.height = window.innerHeight;
+                drawingCanvas.height = window.innerHeight - controlsHeight;
             }
 
             // --- 3. Manejar Subida de Imagen ---
