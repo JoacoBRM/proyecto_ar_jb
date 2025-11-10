@@ -6,9 +6,6 @@
 import { DrawingTools } from './modules/DrawingTools.js';
 import { ImageFilters } from './modules/ImageFilters.js';
 import { MeasurementTools } from './modules/MeasurementTools.js';
-import { CaptureTools } from './modules/CaptureTools.js';
-import { TemplateLibrary } from './modules/TemplateLibrary.js';
-import { ProjectManager } from './modules/ProjectManager.js';
 import { UIHelpers } from './utils/UIHelpers.js';
 
 class CalcoARApp {
@@ -61,9 +58,6 @@ class CalcoARApp {
         this.drawingTools = new DrawingTools(this.drawingCanvas, this.ctx);
         this.imageFilters = new ImageFilters(this.traceImage);
         this.measurementTools = new MeasurementTools(this.drawingCanvas, this.ctx);
-        this.captureTools = new CaptureTools(this.cameraFeed, this.traceImage, this.drawingCanvas);
-        this.templateLibrary = new TemplateLibrary();
-        this.projectManager = new ProjectManager();
         
         // Deshabilitar dibujo por defecto
         this.drawingTools.disable();

@@ -187,125 +187,17 @@
     </div>
 
     <!-- BOTONES LATERALES DERECHOS -->
-    <button id="templatesButton" class="fixed right-4 top-20 z-30 tool-button" title="Plantillas">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
-        </svg>
-    </button>
-
-    <button id="projectsButton" class="fixed right-4 top-32 z-30 tool-button" title="Proyectos">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
-        </svg>
-    </button>
-
-    <button id="filtersButton" class="fixed right-4 top-44 z-30 tool-button" title="Filtros">
+    <button id="filtersButton" class="fixed right-4 top-20 z-30 tool-button" title="Filtros">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"/>
         </svg>
     </button>
 
-    <button id="gridButton" class="fixed right-4 top-56 z-30 tool-button" title="Cuadrícula">
+    <button id="gridButton" class="fixed right-4 top-32 z-30 tool-button" title="Cuadrícula">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
             <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM13 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/>
         </svg>
     </button>
-
-    <!-- BOTÓN DE CAPTURA -->
-    <button id="captureButton" class="capture-button" title="Capturar">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
-        </svg>
-    </button>
-
-    <!-- MENÚ DE CAPTURA -->
-    <div id="captureMenu" class="fixed bottom-32 right-4 z-30 hidden">
-        <div class="tools-panel flex flex-col gap-2 w-48">
-            <button id="capturePhoto" class="text-left px-4 py-2 rounded-lg hover:bg-gray-600 text-white text-sm">
-                📸 Capturar Foto
-            </button>
-            <button id="startRecording" class="text-left px-4 py-2 rounded-lg hover:bg-gray-600 text-white text-sm">
-                🎥 Iniciar Video
-            </button>
-            <button id="shareCapture" class="text-left px-4 py-2 rounded-lg hover:bg-gray-600 text-white text-sm">
-                📤 Compartir
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL DE PLANTILLAS -->
-    <div id="templatesModal" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h2 class="text-2xl font-bold text-white">Biblioteca de Plantillas</h2>
-                <button id="closeTemplates" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <!-- Filtro por categoría -->
-                <div class="filter-pills mb-4">
-                    <button class="filter-pill active" data-category="all">Todas</button>
-                    <button class="filter-pill" data-category="anatomía">Anatomía</button>
-                    <button class="filter-pill" data-category="animales">Animales</button>
-                    <button class="filter-pill" data-category="geometría">Geometría</button>
-                    <button class="filter-pill" data-category="lettering">Lettering</button>
-                    <button class="filter-pill" data-category="custom">Mis Plantillas</button>
-                </div>
-                
-                <!-- Grid de plantillas -->
-                <div id="templatesGrid" class="grid grid-cols-2 gap-4">
-                    <!-- Las plantillas se cargarán dinámicamente -->
-                </div>
-                
-                <!-- Botón para subir plantilla personalizada -->
-                <div class="mt-4">
-                    <label for="uploadTemplate" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Subir Plantilla Personalizada
-                    </label>
-                    <input type="file" id="uploadTemplate" accept="image/*" class="hidden">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE PROYECTOS -->
-    <div id="projectsModal" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2 class="text-2xl font-bold text-white">Mis Proyectos</h2>
-                <button id="closeProjects" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <!-- Botón para guardar proyecto actual -->
-                <button id="saveCurrentProject" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg mb-4 flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/>
-                    </svg>
-                    Guardar Proyecto Actual
-                </button>
-                
-                <!-- Lista de proyectos guardados -->
-                <div class="project-list" id="projectsList">
-                    <!-- Los proyectos se cargarán dinámicamente -->
-                </div>
-                
-                <!-- Opciones de importar/exportar -->
-                <div class="mt-4 pt-4 border-t border-gray-600 flex gap-2">
-                    <button id="exportProject" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg text-sm">
-                        📤 Exportar JSON
-                    </button>
-                    <label for="importProject" class="flex-1 cursor-pointer bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg text-sm text-center">
-                        📥 Importar JSON
-                    </label>
-                    <input type="file" id="importProject" accept="application/json" class="hidden">
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL DE FILTROS -->
     <div id="filtersModal" class="modal-overlay hidden">
