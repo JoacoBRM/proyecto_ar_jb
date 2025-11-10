@@ -32,10 +32,13 @@
     <!-- 3. La imagen para calcar (superpuesta) -->
     <img id="traceImage" class="hidden" style="opacity: 0.5;">
 
+    <!-- 4. Canvas para cuadrícula (superpuesto) -->
+    <canvas id="gridCanvas" class="hidden"></canvas>
+
     <!-- Gradiente de transición -->
     <div class="gradient-overlay"></div>
 
-    <!-- 4. Los controles (parte inferior FIJA) -->
+    <!-- 5. Los controles (parte inferior FIJA) -->
     <div id="controls" class="bg-gray-900">
         <div class="controls-content h-full flex flex-col justify-center px-4 py-6 gap-4 max-w-4xl mx-auto">
             
@@ -78,7 +81,7 @@
             </div>
 
             <!-- Fila 4: Botones de control -->
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-4 gap-3">
                 <label for="upload" class="touch-manipulation cursor-pointer bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl transition-all duration-200 flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
@@ -86,6 +89,13 @@
                     <span class="text-sm">Subir</span>
                 </label>
                 <input type="file" id="upload" accept="image/*" class="hidden">
+
+                <button id="filtersButton" class="touch-manipulation bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold rounded-xl transition-all duration-200 flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm">Filtros</span>
+                </button>
 
                 <button id="resetButton" class="touch-manipulation bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800 text-white font-bold rounded-xl transition-all duration-200 flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">
@@ -104,10 +114,64 @@
                     <span id="lockText" class="text-sm">Libre</span>
                 </button>
             </div>
+
+            <!-- Panel de Filtros (oculto por defecto) -->
+            <div id="filtersPanel" class="hidden bg-gray-800 rounded-lg p-4 space-y-3">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                        </svg>
+                        Filtros de Imagen
+                    </h3>
+                    <button id="closeFilters" class="text-gray-400 hover:text-white text-xl font-bold">✕</button>
+                </div>
+                
+                <!-- Filtros predefinidos -->
+                <div class="grid grid-cols-2 gap-2">
+                    <button data-filter="none" class="filter-btn bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 px-3 rounded-lg transition-all">
+                        Normal
+                    </button>
+                    <button data-filter="grayscale(100%)" class="filter-btn bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 px-3 rounded-lg transition-all">
+                        Blanco y Negro
+                    </button>
+                    <button data-filter="contrast(200%)" class="filter-btn bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 px-3 rounded-lg transition-all">
+                        Alto Contraste
+                    </button>
+                    <button data-filter="invert(100%)" class="filter-btn bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 px-3 rounded-lg transition-all">
+                        Invertir Colores
+                    </button>
+                    <button data-filter="brightness(150%)" class="filter-btn bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 px-3 rounded-lg transition-all">
+                        Más Brillo
+                    </button>
+                    <button data-filter="brightness(50%)" class="filter-btn bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 px-3 rounded-lg transition-all">
+                        Menos Brillo
+                    </button>
+                    <button data-filter="grayscale(100%) contrast(200%)" class="filter-btn bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 px-3 rounded-lg transition-all">
+                        B/N + Contraste
+                    </button>
+                    <button data-filter="sepia(100%)" class="filter-btn bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 px-3 rounded-lg transition-all">
+                        Sepia
+                    </button>
+                </div>
+
+                <!-- Toggle de cuadrícula -->
+                <div class="flex items-center justify-between bg-gray-700 rounded-lg p-3 mt-4">
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM13 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z" />
+                        </svg>
+                        <span class="text-sm font-medium text-white">Cuadrícula</span>
+                    </div>
+                    <button id="gridToggle" class="bg-gray-600 hover:bg-gray-500 text-white text-sm py-1 px-4 rounded-lg transition-all">
+                        <span id="gridText">Mostrar</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- 5. Mensajes (Error o Info) -->
+    <!-- 6. Mensajes (Error o Info) -->
     <div id="messageBox" class="absolute top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white p-4 rounded-lg shadow-lg hidden max-w-md w-11/12" style="z-index: 30;">
         <div class="flex items-center justify-between">
             <span id="messageText" class="flex-1"></span>

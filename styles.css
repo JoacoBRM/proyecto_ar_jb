@@ -162,3 +162,28 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-moz-range-thumb {
     cursor: pointer;
 }
+
+/* Grid Canvas */
+#gridCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60vh;
+    height: 60dvh;
+    pointer-events: none;
+    z-index: 15;
+}
+
+@media (max-width: 640px) {
+    #gridCanvas {
+        height: 55vh;
+        height: 55dvh;
+    }
+}
+
+/* Active filter button */
+.filter-btn.active {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}

@@ -11,6 +11,13 @@ Aplicación web para superponer imágenes sobre la cámara en tiempo real, ideal
 - 📍 Posicionamiento libre con gestos táctiles
 - 🔍 Zoom con pellizco o rueda del mouse
 - 🔒 Bloqueo de imagen para evitar movimientos accidentales
+- 🎨 **Filtros de imagen** para facilitar el calco:
+  - Blanco y Negro
+  - Alto Contraste
+  - Invertir Colores
+  - Ajustes de Brillo
+  - Combinaciones (B/N + Contraste, Sepia)
+- 📐 **Cuadrícula superpuesta** para mantener proporciones
 - 📱 Totalmente responsive (optimizado para móviles)
 
 ## 🚀 Acceso a la Aplicación

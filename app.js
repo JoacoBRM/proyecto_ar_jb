@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const traceImage = document.getElementById('traceImage');
     const drawingCanvas = document.getElementById('drawingCanvas');
     const ctx = drawingCanvas.getContext('2d');
+    const gridCanvas = document.getElementById('gridCanvas');
+    const gridCtx = gridCanvas.getContext('2d');
     const opacitySlider = document.getElementById('opacitySlider');
     const opacityValue = document.getElementById('opacityValue');
     const rotationSlider = document.getElementById('rotationSlider');
@@ -11,6 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadInput = document.getElementById('upload');
     const lockButton = document.getElementById('lockButton');
     const resetButton = document.getElementById('resetButton');
+    const filtersButton = document.getElementById('filtersButton');
+    const filtersPanel = document.getElementById('filtersPanel');
+    const closeFilters = document.getElementById('closeFilters');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const gridToggle = document.getElementById('gridToggle');
+    const gridText = document.getElementById('gridText');
     const iconUnlocked = document.getElementById('icon-unlocked');
     const iconLocked = document.getElementById('icon-locked');
     const lockText = document.getElementById('lockText');
@@ -29,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentY = 0;
     let scale = 1;
     let rotation = 0; // Nueva variable para la rotación
+    let currentFilter = 'none'; // Filtro actual aplicado
+    let isGridVisible = false; // Estado de la cuadrícula
     let isDragging = false;
     let isPinching = false;
     let startTouchX = 0;
@@ -110,6 +120,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         drawingCanvas.width = window.innerWidth;
         drawingCanvas.height = cameraHeight;
+        
+        gridCanvas.width = window.innerWidth;
+        gridCanvas.height = cameraHeight;
+        
+        // Redibujar cuadrícula si está visible
+        if (isGridVisible) {
+            drawGrid();
+        }
     }
 
     // --- 3. Manejar Subida de Imagen ---
@@ -150,6 +168,91 @@ document.addEventListener('DOMContentLoaded', () => {
         updateImageInfo();
     });
 
+    // --- Control de Filtros ---
+    filtersButton.addEventListener('click', () => {
+        filtersPanel.classList.toggle('hidden');
+        if (!filtersPanel.classList.contains('hidden')) {
+            filtersButton.classList.add('bg-purple-800');
+        } else {
+            filtersButton.classList.remove('bg-purple-800');
+        }
+    });
+
+    closeFilters.addEventListener('click', () => {
+        filtersPanel.classList.add('hidden');
+        filtersButton.classList.remove('bg-purple-800');
+    });
+
+    // Aplicar filtros
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const filter = button.getAttribute('data-filter');
+            currentFilter = filter;
+            
+            // Remover clase activa de todos los botones
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            // Agregar clase activa al botón seleccionado
+            button.classList.add('active');
+            
+            // Aplicar filtro
+            if (filter === 'none') {
+                traceImage.style.filter = 'none';
+            } else {
+                traceImage.style.filter = filter;
+            }
+            
+            showMessage(`Filtro aplicado: ${button.textContent}`, "success");
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 2000);
+        });
+    });
+
+    // Toggle de cuadrícula
+    gridToggle.addEventListener('click', () => {
+        isGridVisible = !isGridVisible;
+        
+        if (isGridVisible) {
+            gridCanvas.classList.remove('hidden');
+            drawGrid();
+            gridText.textContent = 'Ocultar';
+            gridToggle.classList.add('bg-green-600');
+            gridToggle.classList.remove('bg-gray-600');
+        } else {
+            gridCanvas.classList.add('hidden');
+            gridText.textContent = 'Mostrar';
+            gridToggle.classList.remove('bg-green-600');
+            gridToggle.classList.add('bg-gray-600');
+        }
+    });
+
+    // Función para dibujar la cuadrícula
+    function drawGrid() {
+        const width = gridCanvas.width;
+        const height = gridCanvas.height;
+        const gridSize = 50; // Tamaño de cada celda de la cuadrícula
+        
+        gridCtx.clearRect(0, 0, width, height);
+        gridCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        gridCtx.lineWidth = 1;
+        
+        // Líneas verticales
+        for (let x = 0; x <= width; x += gridSize) {
+            gridCtx.beginPath();
+            gridCtx.moveTo(x, 0);
+            gridCtx.lineTo(x, height);
+            gridCtx.stroke();
+        }
+        
+        // Líneas horizontales
+        for (let y = 0; y <= height; y += gridSize) {
+            gridCtx.beginPath();
+            gridCtx.moveTo(0, y);
+            gridCtx.lineTo(width, y);
+            gridCtx.stroke();
+        }
+    }
+
     lockButton.addEventListener('click', () => {
         isLocked = !isLocked;
         iconUnlocked.classList.toggle('hidden', isLocked);
@@ -170,7 +273,12 @@ document.addEventListener('DOMContentLoaded', () => {
     resetButton.addEventListener('click', () => {
         if (traceImage.src) {
             resetTransform();
-            showMessage("Imagen recentrada", "info");
+            // Resetear filtros
+            currentFilter = 'none';
+            traceImage.style.filter = 'none';
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            filterButtons[0].classList.add('active'); // Activar "Normal"
+            showMessage("Imagen recentrada y filtros reseteados", "info");
             setTimeout(() => {
                 messageBox.classList.add('hidden');
             }, 2000);
