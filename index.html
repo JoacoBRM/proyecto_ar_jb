@@ -16,7 +16,8 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%234F46E5' width='100' height='100'/><text y='75' x='50' text-anchor='middle' font-size='70' fill='white'>📐</text></svg>">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/extended-styles.css">
 </head>
 <body class="bg-gray-900 text-white">
 
@@ -126,6 +127,255 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- TOOLBAR DE HERRAMIENTAS DE DIBUJO -->
+    <div id="drawingToolbar" class="fixed left-4 top-20 z-30 hidden">
+        <div class="tools-panel flex flex-col gap-2">
+            <button id="toolMove" class="tool-button active" title="Mover">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                </svg>
+            </button>
+            <button id="toolPen" class="tool-button" title="Lápiz">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                </svg>
+            </button>
+            <button id="toolEraser" class="tool-button" title="Borrador">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </button>
+            <button id="toolRuler" class="tool-button" title="Regla">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm3 3a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                </svg>
+            </button>
+            <button id="toolUndo" class="tool-button" title="Deshacer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+            </button>
+            <button id="toolClear" class="tool-button" title="Limpiar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- SELECTOR DE COLORES -->
+    <div id="colorPicker" class="fixed left-4 z-30 hidden" style="top: 380px;">
+        <div class="tools-panel">
+            <div class="color-picker-container">
+                <div class="color-swatch selected" data-color="#000000" style="background: #000000;"></div>
+                <div class="color-swatch" data-color="#FFFFFF" style="background: #FFFFFF;"></div>
+                <div class="color-swatch" data-color="#EF4444" style="background: #EF4444;"></div>
+                <div class="color-swatch" data-color="#3B82F6" style="background: #3B82F6;"></div>
+                <div class="color-swatch" data-color="#10B981" style="background: #10B981;"></div>
+                <div class="color-swatch" data-color="#F59E0B" style="background: #F59E0B;"></div>
+                <div class="color-swatch" data-color="#8B5CF6" style="background: #8B5CF6;"></div>
+                <div class="color-swatch" data-color="#EC4899" style="background: #EC4899;"></div>
+            </div>
+            
+            <div class="brush-size-selector mt-3">
+                <div class="brush-preview">
+                    <div id="brushCircle" class="brush-circle" style="width: 6px; height: 6px;"></div>
+                </div>
+                <input type="range" id="brushSize" min="1" max="20" value="3" class="flex-1">
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTONES LATERALES DERECHOS -->
+    <button id="templatesButton" class="fixed right-4 top-20 z-30 tool-button" title="Plantillas">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+        </svg>
+    </button>
+
+    <button id="projectsButton" class="fixed right-4 top-32 z-30 tool-button" title="Proyectos">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
+        </svg>
+    </button>
+
+    <button id="filtersButton" class="fixed right-4 top-44 z-30 tool-button" title="Filtros">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"/>
+        </svg>
+    </button>
+
+    <button id="gridButton" class="fixed right-4 top-56 z-30 tool-button" title="Cuadrícula">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM13 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/>
+        </svg>
+    </button>
+
+    <!-- BOTÓN DE CAPTURA -->
+    <button id="captureButton" class="capture-button" title="Capturar">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+        </svg>
+    </button>
+
+    <!-- MENÚ DE CAPTURA -->
+    <div id="captureMenu" class="fixed bottom-32 right-4 z-30 hidden">
+        <div class="tools-panel flex flex-col gap-2 w-48">
+            <button id="capturePhoto" class="text-left px-4 py-2 rounded-lg hover:bg-gray-600 text-white text-sm">
+                📸 Capturar Foto
+            </button>
+            <button id="startRecording" class="text-left px-4 py-2 rounded-lg hover:bg-gray-600 text-white text-sm">
+                🎥 Iniciar Video
+            </button>
+            <button id="shareCapture" class="text-left px-4 py-2 rounded-lg hover:bg-gray-600 text-white text-sm">
+                📤 Compartir
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE PLANTILLAS -->
+    <div id="templatesModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-white">Biblioteca de Plantillas</h2>
+                <button id="closeTemplates" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Filtro por categoría -->
+                <div class="filter-pills mb-4">
+                    <button class="filter-pill active" data-category="all">Todas</button>
+                    <button class="filter-pill" data-category="anatomía">Anatomía</button>
+                    <button class="filter-pill" data-category="animales">Animales</button>
+                    <button class="filter-pill" data-category="geometría">Geometría</button>
+                    <button class="filter-pill" data-category="lettering">Lettering</button>
+                    <button class="filter-pill" data-category="custom">Mis Plantillas</button>
+                </div>
+                
+                <!-- Grid de plantillas -->
+                <div id="templatesGrid" class="grid grid-cols-2 gap-4">
+                    <!-- Las plantillas se cargarán dinámicamente -->
+                </div>
+                
+                <!-- Botón para subir plantilla personalizada -->
+                <div class="mt-4">
+                    <label for="uploadTemplate" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Subir Plantilla Personalizada
+                    </label>
+                    <input type="file" id="uploadTemplate" accept="image/*" class="hidden">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PROYECTOS -->
+    <div id="projectsModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-white">Mis Proyectos</h2>
+                <button id="closeProjects" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Botón para guardar proyecto actual -->
+                <button id="saveCurrentProject" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg mb-4 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/>
+                    </svg>
+                    Guardar Proyecto Actual
+                </button>
+                
+                <!-- Lista de proyectos guardados -->
+                <div class="project-list" id="projectsList">
+                    <!-- Los proyectos se cargarán dinámicamente -->
+                </div>
+                
+                <!-- Opciones de importar/exportar -->
+                <div class="mt-4 pt-4 border-t border-gray-600 flex gap-2">
+                    <button id="exportProject" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg text-sm">
+                        📤 Exportar JSON
+                    </button>
+                    <label for="importProject" class="flex-1 cursor-pointer bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg text-sm text-center">
+                        📥 Importar JSON
+                    </label>
+                    <input type="file" id="importProject" accept="application/json" class="hidden">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE FILTROS -->
+    <div id="filtersModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-white">Filtros y Efectos</h2>
+                <button id="closeFilters" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <h3 class="text-white text-sm font-semibold mb-3">Filtros</h3>
+                <div class="filter-pills">
+                    <button class="filter-pill active" data-filter="none">Original</button>
+                    <button class="filter-pill" data-filter="grayscale">Blanco y Negro</button>
+                    <button class="filter-pill" data-filter="invert">Invertir</button>
+                    <button class="filter-pill" data-filter="contrast">Alto Contraste</button>
+                    <button class="filter-pill" data-filter="edge">Contorno</button>
+                    <button class="filter-pill" data-filter="sepia">Sepia</button>
+                </div>
+                
+                <h3 class="text-white text-sm font-semibold mt-6 mb-3">Efectos de Espejo</h3>
+                <div class="flex gap-3">
+                    <button id="flipHorizontal" class="flex-1 tool-button flex flex-col items-center gap-2 py-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 5a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-xs">Horizontal</span>
+                    </button>
+                    <button id="flipVertical" class="flex-1 tool-button flex flex-col items-center gap-2 py-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v6a1 1 0 102 0V7z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-xs">Vertical</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CUADRÍCULA -->
+    <div id="gridModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 350px;">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-white">Cuadrícula</h2>
+                <button id="closeGrid" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-white font-medium">Mostrar Cuadrícula</span>
+                    <div id="gridToggleSwitch"></div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="text-white text-sm font-medium block mb-2">Tamaño de Cuadrícula</label>
+                    <div class="flex items-center gap-3">
+                        <input type="range" id="gridSizeSlider" min="20" max="200" value="50" class="flex-1">
+                        <input type="number" id="gridSizeInput" min="20" max="200" value="50" class="w-20 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+                        <span class="text-gray-400 text-sm">px</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <span class="text-white font-medium">Color de Líneas</span>
+                    <input type="color" id="gridColorPicker" value="#FFFFFF" class="w-12 h-10 rounded cursor-pointer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>
