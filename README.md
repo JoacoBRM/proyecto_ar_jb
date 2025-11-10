@@ -1,111 +1,205 @@
-# 📱 Visor de Calco AR - Aplicación para iPhone
+# � Visor de Calco AR
 
-Aplicación web para calcar dibujos usando la cámara de tu iPhone.
+**Aplicación web para calcar dibujos usando la cámara de tu dispositivo en tiempo real**
 
-## 🚀 Cómo usar en iPhone desde Laragon
-
-### Opción 1: Acceso desde la misma red WiFi (Recomendado)
-
-1. **Asegúrate que Laragon esté corriendo**
-   - Inicia Laragon
-   - Verifica que Apache esté activo (luz verde)
-
-2. **Encuentra tu IP local**
-   - Abre CMD o PowerShell
-   - Ejecuta: `ipconfig`
-   - Busca "IPv4 Address" en tu adaptador WiFi (ejemplo: `192.168.1.100`)
-
-3. **Accede desde tu iPhone**
-   - Conecta tu iPhone a la **misma red WiFi** que tu PC
-   - Abre Safari en tu iPhone
-   - Navega a: `http://TU_IP_LOCAL/proyecto_ar_jb/index.html`
-   - Ejemplo: `http://192.168.1.100/proyecto_ar_jb/index.html`
-
-4. **Permitir acceso a la cámara**
-   - Safari te pedirá permiso para usar la cámara
-   - Toca "Permitir"
-   - ¡Listo! 🎉
-
-### Opción 2: Usando ngrok (para HTTPS)
-
-Si necesitas HTTPS para funciones avanzadas:
-
-1. **Descarga ngrok**
-   - Ve a: https://ngrok.com/download
-   - Crea una cuenta gratuita
-   - Descarga e instala ngrok
-
-2. **Ejecuta ngrok**
-   ```bash
-   ngrok http 80
-   ```
-
-3. **Copia la URL HTTPS**
-   - ngrok te dará una URL como: `https://abc123.ngrok.io`
-   - Agrégale la ruta: `https://abc123.ngrok.io/proyecto_ar_jb/index.html`
-
-4. **Accede desde Safari en iPhone**
-   - Abre esa URL en Safari
-   - Acepta los permisos de cámara
-   - ¡Funciona! 🚀
-
-## 📲 Agregar a pantalla de inicio (iPhone)
-
-Para usarla como una app nativa:
-
-1. Abre la página en Safari
-2. Toca el botón "Compartir" (cuadro con flecha hacia arriba)
-3. Desplázate y toca "Agregar a pantalla de inicio"
-4. Dale un nombre (ej: "Calco AR")
-5. ¡Ahora tienes un ícono en tu pantalla! 📱
-
-## 🎮 Controles
-
-- **Un dedo**: Arrastra la imagen
-- **Dos dedos**: Pellizca para hacer zoom
-- **Slider**: Ajusta la opacidad
-- **Candado**: Fija la imagen (evita movimientos accidentales)
-- **Reset**: Recentra la imagen
-
-## ⚠️ Solución de Problemas
-
-### La cámara no funciona
-- ✅ Verifica que estés en Safari (no Chrome)
-- ✅ Asegúrate de haber dado permisos de cámara
-- ✅ Si usas IP local, verifica que estés en la misma WiFi
-- ✅ Intenta recargar la página (F5 o pull-down)
-
-### No puedo acceder a la página
-- ✅ Verifica que Laragon esté corriendo
-- ✅ Confirma que tu IP sea correcta (ipconfig)
-- ✅ Asegúrate de estar en la misma red WiFi
-- ✅ Desactiva temporalmente el firewall de Windows
-
-### La imagen no se mueve
-- ✅ Verifica que el candado esté "Libre" (no "Fijo")
-- ✅ Asegúrate de haber cargado una imagen primero
-
-## 🔧 Características iOS
-
-La aplicación está optimizada para iOS con:
-- ✅ Meta tags específicos para iPhone
-- ✅ Soporte para agregar a pantalla de inicio
-- ✅ Reproducción automática de video
-- ✅ Gestos táctiles optimizados
-- ✅ Sin zoom accidental
-- ✅ Pantalla completa
-
-## 📝 Notas
-
-- Safari en iOS funciona mejor que Chrome para esta app
-- La cámara trasera se usa por defecto (ideal para calcar)
-- La app funciona completamente offline después de cargarla
-- No se guardan datos, todo es local en tu dispositivo
+Una herramienta simple y poderosa que superpone imágenes sobre la cámara de tu smartphone o tablet, permitiéndote calcar dibujos, diseños o cualquier imagen de referencia sobre papel, lienzo o cualquier superficie.
 
 ---
 
-¿Problemas? Revisa que:
-1. Laragon esté corriendo
-2. Estés en la misma WiFi
-3. La IP sea correcta
-4. Safari tenga permisos de cámara
+## ✨ ¿Qué puedes hacer con esta aplicación?
+
+### 🎨 **Calco Digital Intuitivo**
+Carga cualquier imagen desde tu dispositivo y superpónela sobre lo que estás viendo a través de la cámara. Perfecto para:
+- Calcar dibujos y bocetos
+- Reproducir diseños en superficies físicas
+- Transferir patrones y plantillas
+- Practicar técnicas de dibujo
+- Copiar proporciones y detalles con precisión
+
+### 📱 **Totalmente Móvil**
+Diseñada específicamente para smartphones (especialmente iPhone) y tablets. Usa tu dispositivo móvil como una mesa de luz digital portátil. Llévala contigo a cualquier lugar.
+
+---
+
+## 🎮 Funcionalidades y Controles
+
+### 📂 **Carga de Imágenes**
+- **Botón "Subir"**: Carga cualquier imagen desde tu galería o archivos
+- Soporta formatos: JPG, PNG, GIF y más
+- Vista previa instantánea sobre la cámara
+
+### 🔄 **Transformación Completa de la Imagen**
+
+#### **Movimiento (Posición)**
+- **Táctil**: Arrastra con un dedo para mover la imagen en cualquier dirección
+- **Mouse**: Click y arrastra para reposicionar
+- Movimiento fluido y preciso en tiempo real
+- Información de posición mostrada en pantalla
+
+#### **Escala (Zoom)**
+- **Táctil**: Pellizca con dos dedos para acercar o alejar
+- **Mouse**: Usa la rueda del mouse para zoom
+- Rango de escala: 10% - 500%
+- Zoom suave y progresivo
+
+#### **Rotación**
+- **Slider de rotación**: Control fino de 0° a 359°
+- **Botón rotar izquierda (⟲)**: Gira -15° cada click
+- **Botón rotar derecha (⟳)**: Gira +15° cada click
+- Rotación en tiempo real con indicador de ángulo
+- Perfecto para ajustar la orientación de tu referencia
+
+### 🎨 **Control de Opacidad**
+- Slider interactivo para ajustar transparencia (0% - 100%)
+- Valor predeterminado: 50%
+- Permite ver tanto la imagen como lo que dibujas debajo
+- Ajuste en tiempo real sin interrupciones
+
+### 🔒 **Sistema de Bloqueo**
+- **Botón "Libre/Fijo"**: Congela la posición de la imagen
+- Evita movimientos accidentales mientras calcas
+- Indicador visual del estado (gris = libre, rojo = bloqueado)
+- Toca nuevamente para desbloquear
+
+### 🔄 **Reset Inteligente**
+- **Botón "Reset"**: Recentra y restaura la imagen
+- Vuelve a escala 100%, rotación 0° y posición central
+- Útil para empezar de nuevo rápidamente
+
+### 📊 **Panel de Información**
+Muestra en tiempo real:
+- **Tamaño**: Dimensiones originales de la imagen (ancho × alto)
+- **Escala**: Porcentaje de zoom actual
+- **Posición**: Coordenadas X, Y en la pantalla
+- **Rotación**: Ángulo actual en grados
+
+### 📹 **Visor de Cámara**
+- Acceso automático a la cámara trasera (ideal para calcar)
+- Fallback a cámara frontal si no está disponible
+- Vista en tiempo real sin lag
+- Optimizado para rendimiento en móviles
+
+---
+
+## 💡 Casos de Uso
+
+### 🎨 **Para Artistas**
+- Calcar bocetos y referencias fotográficas
+- Transferir dibujos a lienzos o superficies grandes
+- Practicar proporciones y anatomía
+- Recrear obras de arte con precisión
+
+### 📐 **Para Diseñadores**
+- Reproducir logos y diseños en físico
+- Transferir patrones de diseño gráfico
+- Crear murales y arte urbano
+- Prototipar diseños sobre maquetas
+
+### 🎓 **Para Estudiantes**
+- Aprender técnicas de dibujo
+- Practicar caligrafía y lettering
+- Estudiar proporciones y perspectiva
+- Reproducir ejercicios y tareas
+
+### 🏠 **Para DIY y Manualidades**
+- Decoración de paredes y muebles
+- Stencils y plantillas personalizadas
+- Proyectos de craft y scrapbooking
+- Personalización de objetos
+
+---
+
+## 🌟 Características Técnicas
+
+### ✅ **Diseño Responsive**
+- Interfaz adaptada a móviles, tablets y desktop
+- Controles táctiles optimizados (mínimo 56px para botones)
+- Uso de viewport dinámico (dvh) para máxima compatibilidad
+- Respeta las áreas seguras de iOS (notch y barra inferior)
+
+### ✅ **Optimizado para iOS**
+- Meta tags específicos para iPhone y iPad
+- Compatible con modo "Agregar a pantalla de inicio"
+- Gestos nativos optimizados
+- Sin zoom accidental de página
+- Soporte para cámaras de alta resolución (hasta 1920×1080)
+
+### ✅ **Gestos Intuitivos**
+- Control con un dedo: mover
+- Control con dos dedos: escalar
+- Control con slider: rotar y opacidad
+- Soporte completo para mouse en desktop
+
+### ✅ **Sin Instalación**
+- Aplicación web progresiva (PWA)
+- No requiere descarga desde App Store
+- Funciona directamente desde el navegador
+- Sin ocupar espacio en el dispositivo
+
+### ✅ **Privacidad Total**
+- Procesamiento local en el dispositivo
+- No se envían datos a servidores externos
+- Las imágenes nunca salen de tu teléfono
+- Sin registro ni cuenta requerida
+
+---
+
+## � Compatibilidad
+
+- **Navegadores**: Safari (iOS), Chrome, Firefox, Edge
+- **Dispositivos**: iPhone, iPad, Android, tablets, desktop
+- **Sistema**: iOS 11+, Android 5+, Windows, macOS, Linux
+- **Recomendado**: Safari en iPhone para mejor experiencia
+
+---
+
+## 📱 Uso Rápido
+
+1. **Abre la aplicación** en tu navegador móvil
+2. **Permite el acceso a la cámara** cuando se solicite
+3. **Toca "Subir"** para cargar tu imagen de referencia
+4. **Ajusta** posición, escala, rotación y opacidad
+5. **Bloquea** la imagen cuando esté lista
+6. **¡Empieza a calcar!** 🎨
+
+---
+
+## 🎯 Interfaz Simplificada
+
+```
+┌─────────────────────────────┐
+│                             │
+│    📹 VISOR DE CÁMARA       │ ← 55-60% de la pantalla
+│      + Imagen Superpuesta   │
+│                             │
+├─────────────────────────────┤
+│ 📊 Info: Tamaño │ Escala │  │
+│         Posición │ Rotación │
+├─────────────────────────────┤
+│ 🔄 Rotación        0°       │
+│   [⟲] ━━━━━━━ [⟳]          │
+├─────────────────────────────┤
+│ 🎨 Opacidad        50%      │
+│       ━━━━━━━━━             │
+├─────────────────────────────┤
+│ [📤 Subir] [🔄 Reset] [🔓]  │
+└─────────────────────────────┘
+    ↑ Panel de controles (40-45%)
+```
+
+---
+
+## 💻 Tecnologías
+
+- **HTML5 + CSS3**: Diseño responsive moderno
+- **JavaScript Vanilla**: Sin dependencias externas
+- **MediaDevices API**: Acceso nativo a la cámara
+- **Touch Events API**: Gestos táctiles optimizados
+- **CSS Transforms**: Manipulación de imagen en tiempo real
+- **TailwindCSS**: Framework de utilidades CSS
+
+---
+
+**🎨 Calca. Crea. Comparte.**
+
+*Una herramienta simple pero poderosa para llevar tus ideas del mundo digital al físico.*
