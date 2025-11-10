@@ -24,6 +24,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const rotateRightBtn = document.getElementById('rotateRight');
     const rotationSlider = document.getElementById('rotationSlider');
     const rotationValue = document.getElementById('rotationValue');
+    
+    // Elementos de filtros
+    const filtersButton = document.getElementById('filtersButton');
+    const filtersModal = document.getElementById('filtersModal');
+    const closeFilters = document.getElementById('closeFilters');
+    const filterPills = document.querySelectorAll('.filter-pill');
+    const flipHorizontalBtn = document.getElementById('flipHorizontal');
+    const flipVerticalBtn = document.getElementById('flipVertical');
+    
+    // Elementos de cuadrícula
+    const gridButton = document.getElementById('gridButton');
+    const gridModal = document.getElementById('gridModal');
+    const closeGrid = document.getElementById('closeGrid');
+    const gridSizeSlider = document.getElementById('gridSizeSlider');
+    const gridSizeInput = document.getElementById('gridSizeInput');
+    const gridColorPicker = document.getElementById('gridColorPicker');
+    const gridToggleSwitch = document.getElementById('gridToggleSwitch');
 
     // --- Estado ---
     let isLocked = false;
@@ -39,6 +56,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let startY = 0;
     let initialPinchDistance = 0;
     let initialScale = 1;
+    
+    // Estado de filtros y efectos
+    let currentFilter = 'none';
+    let flipHorizontal = 1; // 1 normal, -1 volteado
+    let flipVertical = 1; // 1 normal, -1 volteado
+    
+    // Estado de cuadrícula
+    let gridEnabled = false;
+    let gridSize = 50;
+    let gridColor = '#FFFFFF';
+    let gridCanvas = null;
+    let gridCtx = null;
 
     // Prevenir zoom y gestos del navegador (especialmente en iOS)
     document.addEventListener('gesturestart', (e) => e.preventDefault());
@@ -154,6 +183,27 @@ document.addEventListener('DOMContentLoaded', () => {
         
         drawingCanvas.width = window.innerWidth;
         drawingCanvas.height = cameraHeight;
+        
+        // Configurar canvas de cuadrícula
+        if (!gridCanvas) {
+            gridCanvas = document.createElement('canvas');
+            gridCanvas.id = 'gridCanvas';
+            gridCanvas.style.position = 'absolute';
+            gridCanvas.style.top = '0';
+            gridCanvas.style.left = '0';
+            gridCanvas.style.pointerEvents = 'none';
+            gridCanvas.style.zIndex = '15';
+            gridCanvas.style.display = 'none';
+            document.body.insertBefore(gridCanvas, drawingCanvas);
+            gridCtx = gridCanvas.getContext('2d');
+        }
+        
+        gridCanvas.width = window.innerWidth;
+        gridCanvas.height = cameraHeight;
+        
+        if (gridEnabled) {
+            drawGrid();
+        }
     }
 
     // --- 3. Manejar Subida de Imagen ---
@@ -341,7 +391,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyTransform() {
-        traceImage.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale}) rotate(${rotation}deg)`;
+        const flipX = flipHorizontal === -1 ? 'scaleX(-1)' : '';
+        const flipY = flipVertical === -1 ? 'scaleY(-1)' : '';
+        traceImage.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale}) rotate(${rotation}deg) ${flipX} ${flipY}`;
     }
 
     function resetTransform() {
@@ -391,14 +443,176 @@ document.addEventListener('DOMContentLoaded', () => {
     closeMessage.addEventListener('click', () => {
         messageBox.classList.add('hidden');
     });
+    
+    // --- 9. Sistema de Filtros ---
+    filtersButton.addEventListener('click', () => {
+        filtersModal.classList.remove('hidden');
+    });
+    
+    closeFilters.addEventListener('click', () => {
+        filtersModal.classList.add('hidden');
+    });
+    
+    filtersModal.addEventListener('click', (e) => {
+        if (e.target === filtersModal) {
+            filtersModal.classList.add('hidden');
+        }
+    });
+    
+    filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            filterPills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            currentFilter = pill.dataset.filter;
+            applyFilter();
+        });
+    });
+    
+    function applyFilter() {
+        traceImage.style.filter = getFilterCSS(currentFilter);
+    }
+    
+    function getFilterCSS(filter) {
+        switch(filter) {
+            case 'none':
+                return 'none';
+            case 'grayscale':
+                return 'grayscale(100%)';
+            case 'invert':
+                return 'invert(100%)';
+            case 'contrast':
+                return 'contrast(200%) brightness(120%)';
+            case 'edge':
+                return 'contrast(300%) grayscale(100%) brightness(150%)';
+            case 'sepia':
+                return 'sepia(100%)';
+            default:
+                return 'none';
+        }
+    }
+    
+    // Efectos de espejo
+    flipHorizontalBtn.addEventListener('click', () => {
+        flipHorizontal *= -1;
+        flipHorizontalBtn.classList.toggle('active');
+        applyTransform();
+        showMessage(flipHorizontal === -1 ? "Espejo horizontal activado" : "Espejo horizontal desactivado", "info");
+        setTimeout(() => messageBox.classList.add('hidden'), 2000);
+    });
+    
+    flipVerticalBtn.addEventListener('click', () => {
+        flipVertical *= -1;
+        flipVerticalBtn.classList.toggle('active');
+        applyTransform();
+        showMessage(flipVertical === -1 ? "Espejo vertical activado" : "Espejo vertical desactivado", "info");
+        setTimeout(() => messageBox.classList.add('hidden'), 2000);
+    });
+    
+    // --- 10. Sistema de Cuadrícula ---
+    gridButton.addEventListener('click', () => {
+        gridModal.classList.remove('hidden');
+    });
+    
+    closeGrid.addEventListener('click', () => {
+        gridModal.classList.add('hidden');
+    });
+    
+    gridModal.addEventListener('click', (e) => {
+        if (e.target === gridModal) {
+            gridModal.classList.add('hidden');
+        }
+    });
+    
+    // Crear switch de toggle para la cuadrícula
+    function createToggleSwitch() {
+        const switchEl = document.createElement('div');
+        switchEl.className = 'toggle-switch';
+        switchEl.innerHTML = `
+            <input type="checkbox" id="gridToggle" ${gridEnabled ? 'checked' : ''}>
+            <label for="gridToggle" class="toggle-label">
+                <span class="toggle-slider"></span>
+            </label>
+        `;
+        gridToggleSwitch.appendChild(switchEl);
+        
+        const checkbox = switchEl.querySelector('#gridToggle');
+        checkbox.addEventListener('change', (e) => {
+            gridEnabled = e.target.checked;
+            if (gridEnabled) {
+                gridCanvas.style.display = 'block';
+                drawGrid();
+                gridButton.classList.add('active');
+                showMessage("Cuadrícula activada", "info");
+            } else {
+                gridCanvas.style.display = 'none';
+                gridButton.classList.remove('active');
+                showMessage("Cuadrícula desactivada", "info");
+            }
+            setTimeout(() => messageBox.classList.add('hidden'), 2000);
+        });
+    }
+    
+    gridSizeSlider.addEventListener('input', (e) => {
+        gridSize = parseInt(e.target.value);
+        gridSizeInput.value = gridSize;
+        if (gridEnabled) {
+            drawGrid();
+        }
+    });
+    
+    gridSizeInput.addEventListener('input', (e) => {
+        let value = parseInt(e.target.value);
+        if (value < 20) value = 20;
+        if (value > 200) value = 200;
+        gridSize = value;
+        gridSizeSlider.value = gridSize;
+        if (gridEnabled) {
+            drawGrid();
+        }
+    });
+    
+    gridColorPicker.addEventListener('input', (e) => {
+        gridColor = e.target.value;
+        if (gridEnabled) {
+            drawGrid();
+        }
+    });
+    
+    function drawGrid() {
+        if (!gridCtx) return;
+        
+        gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+        gridCtx.strokeStyle = gridColor;
+        gridCtx.lineWidth = 1;
+        gridCtx.globalAlpha = 0.5;
+        
+        // Dibujar líneas verticales
+        for (let x = 0; x <= gridCanvas.width; x += gridSize) {
+            gridCtx.beginPath();
+            gridCtx.moveTo(x, 0);
+            gridCtx.lineTo(x, gridCanvas.height);
+            gridCtx.stroke();
+        }
+        
+        // Dibujar líneas horizontales
+        for (let y = 0; y <= gridCanvas.height; y += gridSize) {
+            gridCtx.beginPath();
+            gridCtx.moveTo(0, y);
+            gridCtx.lineTo(gridCanvas.width, y);
+            gridCtx.stroke();
+        }
+        
+        gridCtx.globalAlpha = 1;
+    }
 
-    // --- 8. Ajustar canvas al redimensionar ---
+    // --- 11. Ajustar canvas al redimensionar ---
     window.addEventListener('resize', () => {
         setupCanvas();
     });
 
     // --- Iniciar App ---
     startCamera();
+    createToggleSwitch();
     
     // Mensaje de bienvenida
     showMessage("¡Bienvenido! Carga una imagen para empezar a calcar y rotarla.", "info");
