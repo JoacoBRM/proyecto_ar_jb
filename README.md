@@ -2,7 +2,7 @@
 
 
 
-**La herramienta definitiva para artistas que necesitan un visor de realidad aumentada para calcar y mejorar sus dibujos****Aplicación web para calcar dibujos usando la cámara de tu dispositivo en tiempo real**
+**La herramienta definitiva para artistas que necesitan un visor de realidad aumentada para calcar y mejorar sus dibujos -- Aplicación web para calcar dibujos usando la cámara de tu dispositivo en tiempo real**
 
 
 
